@@ -247,7 +247,7 @@ async function cargarListaClientesPedido(){
                           
   newsArticles.innerHTML =
                   `<table class="table table-responsive table-bordered" id="tblClientesTabla">
-                      <thead>
+                      <thead class="bg-secondary text-white">
                         <tr>
                           <td class="col-5-sm col-5-md">Cliente</td> 
                           <td class="col-4-sm col-4-md">Dirección</td> 

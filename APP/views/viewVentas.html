@@ -44,7 +44,7 @@
                         <label class="modal-title" id="txtNomClientePedido">Consumidor Final</label>
                     </div>
 
-                    <div class="modal-body">
+                    <div class="modal-body p-4">
                             <div class="col-8">
                                 <div class="row">
                                     <label>Total Venta:</label>
@@ -55,16 +55,16 @@
                     
                             </div>
 
-                            <div class="row">
+                            <div class="row card-deck">
                                 
-                                    <div class="card card-rounded shadow col-6" data-dismiss="modal" id="btnVentasCancelar">
+                                    <div class="card card-rounded shadow col-6 hand" data-dismiss="modal" id="btnVentasCancelar">
                                         <button type="button" class="btn btn-secondary btn-icon btn-round btn-lg">
                                             <i class="now-ui-icons ui-1_simple-remove"></i>
                                         </button>
                                         Cancelar
                                     </div>
 
-                                    <div class="card card-rounded shadow col-6" id="btnVentasEditar">
+                                    <div class="card card-rounded shadow col-6 hand" id="btnVentasEditar">
                                         <button class="btn btn-info btn-icon btn-round btn-lg">
                                             <i class="now-ui-icons ui-1_lock-circle-open"></i>
                                         </button>
@@ -73,14 +73,14 @@
                                         
                             </div>
 
-                            <div class="row">
-                                    <div class="card card-rounded shadow col-6" id="btnVentasEliminar">
+                            <div class="row card-deck">
+                                    <div class="card card-rounded shadow col-6 hand" id="btnVentasEliminar">
                                         <button type="button" class="btn btn-danger btn-icon btn-round btn-lg">
                                             <i class="now-ui-icons media-1_button-power"></i> 
                                         </button>
                                     Borrar Pedido
                                     </div>
-                                    <div class="card card-rounded shadow col-6" id="btnVentasEnviar">
+                                    <div class="card card-rounded shadow col-6 hand" id="btnVentasEnviar">
                                         <button type="button" class="btn btn-primary btn-icon btn-round btn-lg" >
                                             <i class="now-ui-icons ui-1_send"></i> 
                                         </button>
@@ -96,7 +96,8 @@
 
 <!-- botón nuevo -->
 <div id="fixed-btn2">
-    <button class="btn btn-success btn-circle btn-xl shadow hand" id="btnNuevoPedido" onclick="CrearNuevoPedido();">+</button>
+    <button class="btn btn-success btn-circle btn-xl shadow hand" id="btnNuevoPedido" data-dismiss="modal" onclick="CrearNuevoPedido();">+</button>
+
 </div>
 
 <style>

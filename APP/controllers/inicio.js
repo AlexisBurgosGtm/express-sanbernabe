@@ -260,3 +260,18 @@ function StartRecognition(){
         
     }
 }
+
+
+
+
+let Navegar = {
+    inicio:()=>{
+        funciones.loadView('./views/viewVentas.html')
+        .then(()=>{
+            dbSelectDocumentos(document.getElementById('tblDocumentos'),1);
+        });
+    },
+    pedido:()=>{
+        
+    }
+}

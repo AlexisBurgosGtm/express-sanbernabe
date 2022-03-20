@@ -36,14 +36,14 @@
     z-index: 1088;
     right: 21px;
     bottom: 15px;
-    }
+};
   
-  .btn-bottom-left { 
+.btn-bottom-left { 
     position: fixed;
     z-index: 1088;
     left: 21px;
     bottom: 15px;
-    }
+};
   
   .btn-bottom-middle { 
         position: fixed;
@@ -95,6 +95,12 @@ right: 21px;
 bottom: 15px;
 }
 
+#btn-left { 
+  position: fixed;
+  z-index: 1088;
+  left: 21px;
+  bottom: 15px;
+  }
 .btn-circle.btn-xl {
     width: 70px;
     height: 70px;
