@@ -9,7 +9,6 @@ funciones = {
                 confirm: true,
               }})
     },
-
     Aviso: function(msn){
         swal(msn, {
             timer: 1500,
@@ -35,7 +34,25 @@ funciones = {
             
         }
     },
+    instalationHandlers: (idBtnInstall)=>{
+          //INSTALACION APP
+          let btnInstalarApp = document.getElementById(idBtnInstall);
+          btnInstalarApp.hidden = true;
 
+          let capturedInstallEvent;
+          window.addEventListener('beforeinstallprompt',(e)=>{
+            e.preventDefault();
+            btnInstalarApp.hidden = false;
+            capturedInstallEvent = e;
+          });
+          btnInstalarApp.addEventListener('click',(e)=>{
+            capturedInstallEvent.prompt();
+            capturedInstallEvent.userChoice.then((choice)=>{
+              //solicita al usuario confirmacion para instalar
+            })
+          })
+          //INSTALACION APP
+    },
     FiltrarListaProductos: function(idTabla){
         swal({
           text: 'Escriba para buscar...',
@@ -51,8 +68,7 @@ funciones = {
 
             //'tblProductosVentas'
         })
-      },
-
+    },
     setMoneda: function(num,signo) {
         num = num.toString().replace(/\$|\,/g, '');
         if (isNaN(num)) num = "0";
@@ -65,7 +81,6 @@ funciones = {
             num = num.substring(0, num.length - (4 * i + 3)) + ',' + num.substring(num.length - (4 * i + 3));
         return (((sign) ? '' : '-') + signo + ' ' + num + ((cents == "00") ? '' : '.' + cents));
     },
-
     loadScript: function(url) {
 
         return new Promise((resolve, reject) => {
@@ -80,7 +95,6 @@ funciones = {
           document.body.appendChild(script);
         });
     },
-
     fetchData: (url)=>{
         fetch(url)
             .then(function(response) {
@@ -88,7 +102,6 @@ funciones = {
                                     })
             .catch();
     },
-
     loadView: (url)=> {
         return new Promise((resolve, reject) => {
             
@@ -118,8 +131,7 @@ funciones = {
       
           });
     },
-   
-   initGoogleMaps: function(){
+    initGoogleMaps: function(){
         var myLatlng = new google.maps.LatLng(40.748817, -73.985428);
         var mapOptions = {
           zoom: 13,
@@ -138,8 +150,7 @@ funciones = {
         // To add the marker to the map, call setMap();
         marker.setMap(map);
     },
-
-	showNotification: function(from, align,msn, tipo){
+	  showNotification: function(from, align,msn, tipo){
         let stcolor = '';
         switch (tipo) {
             case 'error':
@@ -171,12 +182,10 @@ funciones = {
             }
         });
     },
-    
     hablar: function(msn){
         var utterance = new SpeechSynthesisUtterance(msn);
         return window.speechSynthesis.speak(utterance); 
     },
-
     CompaniaTelefono: function(numero,hablado){
         var rangos = [[30000000,32289999,"TIGO"],
         [32290000,32299999,"CLARO"],
@@ -265,9 +274,8 @@ funciones = {
     } else {
     return "Ingrese 8 dígitos";
     }
- },
-
- crearBusquedaTabla: function(idTabla,idBusqueda){
+    },
+    crearBusquedaTabla: function(idTabla,idBusqueda){
     var tableReg = document.getElementById(idTabla);
     var searchText = document.getElementById(idBusqueda).value.toLowerCase();
       var cellsOfRow="";
@@ -298,7 +306,7 @@ funciones = {
                       tableReg.rows[i].style.display = 'none';
                   }
               }
-  },
+    },
 
   FiltrarTabla: function(idTabla,filtro){
     var tableReg = document.getElementById(idTabla);

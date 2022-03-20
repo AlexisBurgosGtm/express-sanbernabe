@@ -274,4 +274,6 @@ let Navegar = {
     pedido:()=>{
         
     }
-}
+};
+
+funciones.instalationHandlers('btnInstalar');
