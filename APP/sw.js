@@ -1,7 +1,7 @@
 let GlobalSelectedForm = 'viewLogin';
 let GlobalBool = 0;
 
-var CACHE = 'express-online';
+var CACHE = 'express-online2';
 const staticAssets = [
   './',
   './manifest.json',

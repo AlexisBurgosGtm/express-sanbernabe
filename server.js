@@ -3,21 +3,10 @@ var app = express();
 var router = express.Router();
 var bodyParser = require('body-parser');
 
+var execute = require('./connection');
+
+
 const PORT = process.env.PORT || 3600;
-
-/*
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-*/
-
-
-const config = {user: 'DB_A54053_Respaldobd_admin',password: 'Alexis2020',server: 'SQL5049.site4now.net',database: 'DB_A54053_Respaldobd',pool: {	max: 100,	min: 0,	idleTimeoutMillis: 30000}};
-//const config = {user: 'DB_A45479_EXPRESS_admin',password: 'razors1805',server: 'sql7002.site4now.net',database: 'DB_A45479_EXPRESS',pool: {	max: 100,	min: 0,	idleTimeoutMillis: 30000}};
-//const config = {user: 'iEx', password: 'iEx', server: 'SERVERALEXIS\\SQLEXPRESS', database: 'ARES_SYNC', pool: {max: 100,min: 0,idleTimeoutMillis: 30000}};
-
-//const config = {user: 'iEx', password: 'iEx', server: 'SERVERALEXIS\\SQLEXPRESS', database: 'DB_A45479_EXPRESS', pool: {max: 100,min: 0,idleTimeoutMillis: 30000}};
-
-const sqlString = 'mssql://' + config.user + ':' + config.password + '@' + config.server + '/' + config.database;
 
 app.use(bodyParser.json());
 
@@ -27,7 +16,7 @@ var path = __dirname + '/'
 
 //manejador de rutas
 router.use(function (req,res,next) {
-  console.log("/" + req.method);
+  //console.log("/" + req.method);
   next();
 });
 
@@ -39,251 +28,193 @@ app.get("/",function(req,res){
 // OBTIENE TODAS LAS EMPRESAS
 app.get("/api/empresas/all", async(req,res)=>{
 
-	const sql = require('mssql')
 	let token = req.query.token;
-
-	const pool = await sql.connect(sqlString)
-	try {
-		//const pool = await sql.connect(sqlString)
-		const result = await sql.query`SELECT EMPNIT,EMPNOMBRE FROM EMPRESAS WHERE TOKEN=${token} ORDER BY EMPNOMBRE`
-		console.dir('Empresas cargadas exitosamente token ' + token);
 	
-		res.send(result);
-		
-	} catch (err) {
-		console.log(String(err));
-	}
-	sql.close()
+	let qry = `SELECT EMPNIT,EMPNOMBRE FROM EMPRESAS WHERE TOKEN='${token}' ORDER BY EMPNOMBRE`
+	
+	execute.Query(res,qry);
+
 });
 
 //OBTIENE LAS VENTAS POR DIA Y VENDEDOR
 app.get("/api/ventas/dia", async(req,res)=>{
 	
-	const sql = require('mssql')
 	let token = req.query.token;
-	/*
-	const pool = await sql.connect(sqlString)
-	try {
-		const result = await sql.query`SELECT ANIO,MES,DIA,CODVEN,NOMVEN,VENTA,EMPNIT FROM VENTAS_DIA_VENDEDOR WHERE TOKEN=${token}`
-		console.dir('Generado Ventas por vendedor por día');
-		res.send(result);
-	} catch (err) {
-		console.log(String(err));
-	}
-	sql.close()*/
+	let qry = `SELECT ANIO,MES,DIA,CODVEN,NOMVEN,VENTA,EMPNIT FROM VENTAS_DIA_VENDEDOR WHERE TOKEN='${token}';`;
+
+	execute.Query(res,qry);
+
 });
 
 //OBTIENE LA LISTA DE PRODUCTOS Y PRECIOS CON EXISTENCIA
 app.get("/api/productos/all", async(req,res)=>{
-	const sql = require('mssql')
+
 	let token = req.query.token
-			const pool = await sql.connect(config)		
-			try {
-				const result = await sql.query`SELECT CODPROD,DESPROD,DESMARCA,CODMEDIDA,EQUIVALE,COSTO,PRECIO,concat('Q',PRECIO) as QPRECIO, EXISTENCIA, EMPNIT FROM PRECIOS WHERE TOKEN=${token}`
-				console.dir('Productos cargados');
-				res.send(result);
-			} catch (err) {
-				console.log(String(err));
-			}
-			sql.close()
+	
+	let qry =  `SELECT CODPROD,DESPROD,DESMARCA,CODMEDIDA,EQUIVALE,COSTO,PRECIO,concat('Q',PRECIO) as QPRECIO, EXISTENCIA, EMPNIT
+	 FROM PRECIOS WHERE TOKEN='${token}';`
+	execute.Query(res,qry);
+			
 });
 
 //OBTIENE LA LISTA DE PRODUCTOS CON EXISTENCIA ÚNICA
 app.get("/api/productos/inventario", async(req,res)=>{
-	const sql = require('mssql')
-	let token = req.query.token
-			const pool = await sql.connect(config)		
-			try {
-				const result = await sql.query`SELECT CODPROD, DESPROD, EXISTENCIA, LASTUPDATE FROM PRECIOS GROUP BY TOKEN, EMPNIT, CODPROD, DESPROD, EXISTENCIA, LASTUPDATE HAVING (TOKEN = ${token})`
-				console.dir('Existencias cargadas');
-				res.send(result);
-			} catch (err) {
-				console.log(String(err));
-			}
-			sql.close()
-});
 
+	let token = req.query.token
+
+	let qry = `SELECT CODPROD, DESPROD, EXISTENCIA, LASTUPDATE
+		 FROM PRECIOS GROUP BY TOKEN, EMPNIT, CODPROD, DESPROD, EXISTENCIA, LASTUPDATE HAVING (TOKEN = '${token}');`
+				
+	execute.Query(res,qry);
+
+});
 
 
 // OBTIENE TODOS LOS CLIENTES DE LA TABLA
 app.get("/api/clientes/all", async(req,res)=>{
-	const sql = require('mssql')
+
 	let token = req.query.token;
 
-	const pool = await sql.connect(sqlString)
-	try {
-		const result = await sql.query`SELECT CLIENTES.CODCLIENTE, CLIENTES.NIT, CLIENTES.NOMCLIENTE, CLIENTES.DIRCLIENTE, MUNICIPIOS.DESMUNICIPIO, DEPARTAMENTOS.DESDEPARTAMENTO, CLIENTES.TELEFONOS, CLIENTES.SALDO, CLIENTES.EMPNIT
+	let qry = `SELECT CLIENTES.CODCLIENTE, CLIENTES.NIT, CLIENTES.NOMCLIENTE, CLIENTES.DIRCLIENTE, MUNICIPIOS.DESMUNICIPIO, DEPARTAMENTOS.DESDEPARTAMENTO, CLIENTES.TELEFONOS, CLIENTES.SALDO, CLIENTES.EMPNIT
 									FROM CLIENTES LEFT OUTER JOIN DEPARTAMENTOS ON CLIENTES.CODDEPTO = DEPARTAMENTOS.CODDEPARTAMENTO LEFT OUTER JOIN
 								 				MUNICIPIOS ON CLIENTES.CODMUNICIPIO = MUNICIPIOS.CODMUNICIPIO
-									WHERE (CLIENTES.TOKEN=${token})`
-		console.dir('CLIENTES cargados');
-		
-		res.send(result);
-	} catch (err) {
-		console.log(String(err));
-	}
-	sql.close()
+									WHERE (CLIENTES.TOKEN='${token}')`
+	
+	execute.Query(res,qry);
+
 });
 
 //OBTIENE LA LISTA DE REPARTIDORES
 app.get("/api/reparto/repartidores/all", async(req,res)=>{
-	const sql = require('mssql')
+	
 	let token = req.query.token
-			const pool = await sql.connect(config)		
-			try {
-				const result = await sql.query`SELECT EMPNIT,CODREP,NITREP,DESREP,DIRREP,TELREP,CONTACTO,TELCONTACTO,EMAIL,WHATSAPP,CLAVE FROM REPARTIDORES WHERE TOKEN=${token}`
-				console.dir('Repartidores cargados...');
-				res.send(result);
-			} catch (err) {
-				console.log(String(err));
-			}
-			sql.close()
+	let qry = `SELECT EMPNIT,CODREP,NITREP,DESREP,DIRREP,TELREP,CONTACTO,TELCONTACTO,EMAIL,WHATSAPP,CLAVE
+	 FROM REPARTIDORES WHERE TOKEN='${token}';`
+	execute.Query(res,qry);
+
 });
 
 app.get("/api/reparto/usuarios/login", async(req,res)=>{
-	const sql = require('mssql')
+
 	let token = req.query.token;
 	
-		const pool = await sql.connect(sqlString)
-		try {
-			const result = await sql.query`SELECT EMPNIT,CODREP,DESREP,CLAVE FROM REPARTIDORES WHERE TOKEN=${token}`
-			console.dir('La consulta usuario se generó');
-			res.send(result);
-		
-		} catch (err) {
-			// ... error checks
-			res.send('Denegado');
-			console.log('Error en la consulta usuarios');
-		}
-		sql.close()
+	let qry = `SELECT EMPNIT,CODREP,DESREP,CLAVE FROM REPARTIDORES WHERE TOKEN='${token}';`
+
+	execute.Query(res,qry);
+
 });
 
 app.get("/api/reparto/enviospendientes", async(req,res)=>{
-	const sql = require('mssql');
-	let token = req.query.token
-			const pool = await sql.connect(config)		
-			try {
-				const result = await sql.query`SELECT WEB_DOCUMENTOS.EMPNIT, WEB_DOCUMENTOS.CODDOC, WEB_DOCUMENTOS.CORRELATIVO, CLIENTES.NOMCLIENTE, CLIENTES.DIRCLIENTE,CLIENTES.TELEFONOS,WEB_DOCUMENTOS.TOTALVENTA, concat('Q',WEB_DOCUMENTOS.TOTALVENTA) as QPRECIO, WEB_DOCUMENTOS.CODREP, 
-												REPARTIDORES.DESREP, WEB_DOCUMENTOS.ENTREGADO FROM WEB_DOCUMENTOS LEFT OUTER JOIN
-												REPARTIDORES ON WEB_DOCUMENTOS.CODREP = REPARTIDORES.CODREP AND WEB_DOCUMENTOS.EMPNIT = REPARTIDORES.EMPNIT AND 
-												WEB_DOCUMENTOS.TOKEN = REPARTIDORES.TOKEN LEFT OUTER JOIN
-												CLIENTES ON WEB_DOCUMENTOS.CODCLIENTE = CLIENTES.CODCLIENTE AND WEB_DOCUMENTOS.EMPNIT = CLIENTES.EMPNIT AND WEB_DOCUMENTOS.TOKEN = CLIENTES.TOKEN
-												WHERE (WEB_DOCUMENTOS.ENTREGADO = 'NO') AND (WEB_DOCUMENTOS.TOKEN=${token})`
-				console.dir('Envios pendientes Cargados...');
-				res.send(result);
-			} catch (err) {
-				console.log(String(err));
-			}
-			sql.close()
+
+	let token = req.query.token;
+
+	let qry = `SELECT WEB_DOCUMENTOS.EMPNIT, WEB_DOCUMENTOS.CODDOC, WEB_DOCUMENTOS.CORRELATIVO, CLIENTES.NOMCLIENTE, CLIENTES.DIRCLIENTE,CLIENTES.TELEFONOS,WEB_DOCUMENTOS.TOTALVENTA, concat('Q',WEB_DOCUMENTOS.TOTALVENTA) as QPRECIO, WEB_DOCUMENTOS.CODREP, 
+				REPARTIDORES.DESREP, WEB_DOCUMENTOS.ENTREGADO FROM WEB_DOCUMENTOS LEFT OUTER JOIN
+				REPARTIDORES ON WEB_DOCUMENTOS.CODREP = REPARTIDORES.CODREP AND WEB_DOCUMENTOS.EMPNIT = REPARTIDORES.EMPNIT AND 
+				WEB_DOCUMENTOS.TOKEN = REPARTIDORES.TOKEN LEFT OUTER JOIN
+				CLIENTES ON WEB_DOCUMENTOS.CODCLIENTE = CLIENTES.CODCLIENTE AND WEB_DOCUMENTOS.EMPNIT = CLIENTES.EMPNIT AND WEB_DOCUMENTOS.TOKEN = CLIENTES.TOKEN
+				WHERE (WEB_DOCUMENTOS.ENTREGADO = 'NO') AND (WEB_DOCUMENTOS.TOKEN='${token}');`
+	
+	execute.Query(res,qry);
+
 });
 
 app.get("/api/reparto/enviosentregados", async(req,res)=>{
-	const sql = require('mssql');
+	
 	let token = req.query.token
-			const pool = await sql.connect(config)		
-			try {
-				const result = await sql.query`SELECT WEB_DOCUMENTOS.EMPNIT, WEB_DOCUMENTOS.CODDOC, WEB_DOCUMENTOS.CORRELATIVO, CLIENTES.NOMCLIENTE, CLIENTES.DIRCLIENTE,CLIENTES.TELEFONOS,WEB_DOCUMENTOS.TOTALVENTA, concat('Q',WEB_DOCUMENTOS.TOTALVENTA) as QPRECIO, WEB_DOCUMENTOS.CODREP, 
+	let qry = `SELECT WEB_DOCUMENTOS.EMPNIT, WEB_DOCUMENTOS.CODDOC, WEB_DOCUMENTOS.CORRELATIVO, CLIENTES.NOMCLIENTE, CLIENTES.DIRCLIENTE,CLIENTES.TELEFONOS,WEB_DOCUMENTOS.TOTALVENTA, concat('Q',WEB_DOCUMENTOS.TOTALVENTA) as QPRECIO, WEB_DOCUMENTOS.CODREP, 
 												REPARTIDORES.DESREP, WEB_DOCUMENTOS.ENTREGADO FROM WEB_DOCUMENTOS LEFT OUTER JOIN
 												REPARTIDORES ON WEB_DOCUMENTOS.CODREP = REPARTIDORES.CODREP AND WEB_DOCUMENTOS.EMPNIT = REPARTIDORES.EMPNIT AND 
 												WEB_DOCUMENTOS.TOKEN = REPARTIDORES.TOKEN LEFT OUTER JOIN
 												CLIENTES ON WEB_DOCUMENTOS.CODCLIENTE = CLIENTES.CODCLIENTE AND WEB_DOCUMENTOS.EMPNIT = CLIENTES.EMPNIT AND WEB_DOCUMENTOS.TOKEN = CLIENTES.TOKEN
-												WHERE (WEB_DOCUMENTOS.ENTREGADO = 'SI') AND (WEB_DOCUMENTOS.TOKEN=${token})`
-				console.dir('Envios pendientes Cargados...');
-				res.send(result);
-			} catch (err) {
-				console.log(String(err));
-			}
-			sql.close()
+												WHERE (WEB_DOCUMENTOS.ENTREGADO = 'SI') AND (WEB_DOCUMENTOS.TOKEN='${token}')`
+	execute.Query(res,qry);
+
 });
 
 app.post("/api/reparto/marcarenviado", async(req,res)=>{
-	const sql = require('mssql');
+	
 	let token = req.body.token;
 	let empnit = req.body.empnit;
 	let coddoc = req.body.coddoc;
 	let correlativo = Number(req.body.correlativo);
 
-	let sqlQry = `UPDATE WEB_DOCUMENTOS SET ENTREGADO='SI' WHERE TOKEN='${token}' AND EMPNIT='${empnit}' AND CODDOC='${coddoc}' AND CORRELATIVO=${correlativo}`
+	let sqlQry = `UPDATE WEB_DOCUMENTOS SET ENTREGADO='SI'
+		 WHERE TOKEN='${token}' AND EMPNIT='${empnit}' AND CODDOC='${coddoc}' AND CORRELATIVO=${correlativo}`
 	
-	const pool1 = await new sql.ConnectionPool(config, err => {
-		// ... error checks
-				 
-		// Query
-		 pool1.request() // or: new sql.Request(pool1)
-		 //.input('entregado', sql.VarChar(2), 'NO')
-		 .query(sqlQry, (err, result) => {
-			if (result.rowsAffected){
-				res.send('Ingreso exitoso')
-			}
-		});
-		//sql.close()
-		//pool1.release();
- 
-	})
-	 
-	pool1.on('error', err => {
-		// ... error handler
-	})
-
+	execute.Query(res,sqlQry);
+	
 });
 
 app.post("/api/reparto/marcarnoenviado", async(req,res)=>{
-	const sql = require('mssql');
 	
 	let token = req.body.token;
 	let empnit = req.body.empnit;
 	let coddoc = req.body.coddoc;
 	let correlativo = Number(req.body.correlativo);
 
-	let sqlQry = `UPDATE WEB_DOCUMENTOS SET ENTREGADO='NO' WHERE TOKEN='${token}' AND EMPNIT='${empnit}' AND CODDOC='${coddoc}' AND CORRELATIVO=${correlativo}`
+	let sqlQry = `UPDATE WEB_DOCUMENTOS SET ENTREGADO='NO' 
+				WHERE TOKEN='${token}' AND EMPNIT='${empnit}' AND CODDOC='${coddoc}' AND CORRELATIVO=${correlativo}`
 
-			//const pool = await sql.connect(sqlString)
-			const pool1 = await new sql.ConnectionPool(config, err => {
-				// ... error checks
-						 
-				// Query
-				 pool1.request() // or: new sql.Request(pool1)
-				 //.input('entregado', sql.VarChar(2), 'NO')
-				 .query(sqlQry, (err, result) => {
-					if (result.rowsAffected){
-						res.send('Ingreso exitoso')
-					}
-				});
-				//sql.close()
-				//pool1.release();
-		 
-			})
-			 
-			pool1.on('error', err => {
-				// ... error handler
-			})
-
-
+	execute.Query(res,sqlQry);
 
 });
 
 // OBTIENE LA LISTA DE VENDEDORES
 app.get("/api/usuarios/login", async(req,res)=>{
-	const sql = require('mssql')
+	
 	let token = req.query.token;
 	
-		const pool = await sql.connect(sqlString)
-		try {
-			const result = await sql.query`SELECT CODVEN, NOMVEN, CLAVE, CODDOC,EMPNIT FROM VENDEDORES WHERE TOKEN=${token}`
-			console.dir('La consulta usuario se generó');
-			res.send(result);
+	 let qry = `SELECT CODVEN, NOMVEN, CLAVE, CODDOC,EMPNIT FROM VENDEDORES WHERE TOKEN='${token}';`
 		
-		} catch (err) {
-			// ... error checks
-			res.send('Denegado');
-			console.log('Error en la consulta usuarios');
-		}
-		sql.close()
+	 execute.Query(res,qry);
+
 });
+
+
+app.post("/api/ventas/documentos", async(req,res)=>{
+
+	let _empnit = req.body.empnit;
+	let _coddoc = req.body.coddoc;
+	let _correlativo = req.body.correlativo;
+	let _codcliente = req.body.codcliente;
+	let _totalventa = req.body.totalventa;
+	let _totalcosto = req.body.totalcosto;
+	let _token = req.body.token;
+	let _anio =  req.body.anio;
+	let _mes = req.body.mes;
+	let _dia = req.body.dia;
+	let _codven = req.body.codven;
+	let _fecha = req.body.fecha;  //new Date(_anio,_mes,_dia);
+	let _obs = req.body.obs;
+	let _st = req.body.st;
+	
+	let _jsondocproductos = JSON.parse(req.body.jsondocproductos);
+	
+	let qrydocprod = '';
+	_jsondocproductos.map((p)=>{
+        qrydocprod += `INSERT INTO WEB_DOCPRODUCTOS (token,empnit,anio,mes,dia,coddoc,correlativo,codprod,desprod,codmedida,equivale,cantidad,totalunidades,costo,precio,totalcosto,totalprecio) 
+		values ('${_token}','${_empnit}',${_anio},${_mes},${_dia},'${_coddoc}',${_correlativo},'${p.codprod}','${p.desprod}','${p.codmedida}',${p.equivale},${p.cantidad},${Number(p.equivale)*Number(p.cantidad)},${p.costo},${p.precio},${p.totalcosto},${p.subtotal});`;
+    });
+		
+
+	let qry = `
+		INSERT INTO WEB_DOCUMENTOS 
+					(empnit,token,coddoc,correlativo,anio,mes,dia,fecha,codven,codcliente,totalventa,totalcosto,obs,codst,entregado) 
+			VALUES ('${_empnit}','${_token}','${_coddoc}',${_correlativo},${_anio},${_mes},${_dia},'${_fecha}',${_codven},
+					${_codcliente},${_totalventa},${_totalcosto},'${_obs}',${_st},'NO');
+	`
+	
+	console.log(qry + qrydocprod);
+	
+	execute.Query(res, qry + qrydocprod);
+
+});
+
 
 // INSERTA DATOS EN LA TABLA DOCUMENTOS DEL SERVER
 //app.get("/api/ventas/documentos", async(req,res)=>{
-app.post("/api/ventas/documentos", async(req,res)=>{
+app.post("/api/ventas/documentos_OLD", async(req,res)=>{
 
 	const sql = require('mssql')
 	let _empnit = req.body.empnit;
@@ -342,7 +273,7 @@ app.post("/api/ventas/documentos", async(req,res)=>{
 });
 
 // INSERTA DATOS EN LA TABLA DOCPRODUCTOS DEL SERVER
-app.post("/api/ventas/docproductos", async(req,res)=>{
+app.post("/api/ventas/docproductos_OLD", async(req,res)=>{
 
 	const sql = require('mssql')
 	let _token = req.body.token;
@@ -400,40 +331,15 @@ app.post("/api/ventas/docproductos", async(req,res)=>{
 		})
 });
 
+
 app.use("/",router);
 
 app.use("*",function(req,res){
-  res.sendFile(path + "APP/views/404.html");
+  res.sendFile(path + "/views/404.html");
 });
 
-/*
-io.on('connection', function(socket){
-	socket.on('chat message', function(msg,user){
-	  io.emit('chat message', msg, user);
-	});
-});
-*/
+
 app.listen(PORT, function () {
   console.log('Servidor iniciado en el puerto ' + String(PORT));
 });
 
-/*
-http.listen(PORT, function(){
-  console.log('listening on *:' + PORT);
-});
-*/
-
-/*CODIGO PARA EL HTML Y SOCKET
-   $(function () {
-        var socket = io();
-        $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
-          return false;
-        });
-        socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-          window.scrollTo(0, document.body.scrollHeight);
-        });
-      });
-*/

@@ -1,10 +1,10 @@
 
-async function SyncDocumentos(token,coddoc,correlativo,anio,mes,dia,codcliente,codven,totalventa,totalcosto,obs,st){
+async function SyncDocumentos(token,coddoc,correlativo,fecha,anio,mes,dia,codcliente,codven,totalventa,totalcosto,obs,st,jsonp){
     var empnit = GlobalEmpnit;
-    var fecha = new Date;
-    anio = fecha.getFullYear();
-    mes = fecha.getMonth()+1;
-    dia = fecha.getDate();
+    var f = new Date(fecha);
+    anio = f.getFullYear();
+    mes = f.getMonth()+1;
+    dia = f.getUTCDate();
 
         var data =JSON.stringify({
             token:token,
@@ -14,12 +14,14 @@ async function SyncDocumentos(token,coddoc,correlativo,anio,mes,dia,codcliente,c
             anio:anio,
             mes:mes,
             dia:dia,
+            fecha:fecha,
             codven:codven,
             codcliente:codcliente,
             totalventa:totalventa,
             totalcosto:totalcosto,
             obs:obs,
-            st:st
+            st:st,
+            jsondocproductos:jsonp
         });
       
         var peticion = new Request('/api/ventas/documentos', {
@@ -51,55 +53,4 @@ async function SyncDocumentos(token,coddoc,correlativo,anio,mes,dia,codcliente,c
     };
 
 
-async function SyncDocumentosDet(token,empnit,coddoc,correlativo,anio,mes,dia,codprod,desprod,codmedida,equivale,cantidad,costo,totalcosto,precio,totalprecio){
-    var fecha = new Date;
-    anio = fecha.getFullYear();
-    mes = fecha.getMonth()+1;
-    dia = fecha.getDate();
-        console.log('LLamado fetch en docproductos ' + desprod);
-
-            var data =JSON.stringify({
-                token:token,
-                empnit:empnit,
-                coddoc:coddoc,
-                correlativo:correlativo,
-                anio:anio,
-                mes:mes,
-                dia:dia,
-                codprod:codprod,
-                desprod:desprod,
-                codmedida:codmedida,
-                equivale:equivale,
-                cantidad:cantidad,
-                costo:costo,
-                precio:precio,
-                totalcosto:totalcosto,
-                totalprecio:totalprecio
-            });
-          
-            var peticion = new Request('/api/ventas/docproductos', {
-                method: 'POST',
-                headers: new Headers({
-                    // Encabezados
-                   'Content-Type': 'application/json'
-                }),
-                body: data
-              });
-        
-              await fetch(peticion)
-              
-              .then(function(res) {
-                console.log('Estado: ', res.status);
-                if (res.status==200)
-                {
-                    //funciones.Aviso('Pedido enviado exitosamente!!');
-                }
-              })
-              .catch(
-                  ()=>{
-                    //funciones.AvisoError('No se logró conectar con el servidor');
-                  }
-              )
-};
-      
 

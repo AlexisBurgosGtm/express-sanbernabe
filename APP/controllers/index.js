@@ -5,7 +5,7 @@ let btnConfigTokenInicial;
 
 
 async function fcnLogin(){
-    GlobalTipoApp = document.getElementById('cmbAplicacion').value;
+    GlobalTipoApp = 'SALES'; //document.getElementById('cmbAplicacion').value;
     cmbEmpnit = document.getElementById('cmbEmpresas');
     user = document.getElementById('txtUser');
     let pass = document.getElementById('txtPass');

@@ -1,3 +1,92 @@
+.circle{
+    width: 65%;
+    border-radius: 50%;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+}
+
+.shadow{
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+}
+
+.hidden {
+    visibility: hidden;
+};
+
+.negrita {
+    font-weight: bold;
+};
+
+
+.cursormano{
+    cursor: pointer;
+};
+
+.currSign:before {
+    content: 'Q';
+  }
+  
+  .fontsmall {
+      font-size: 90%;
+  
+};
+
+.btn-bottom-right { 
+    position: fixed;
+    z-index: 1088;
+    right: 21px;
+    bottom: 15px;
+    }
+  
+  .btn-bottom-left { 
+    position: fixed;
+    z-index: 1088;
+    left: 21px;
+    bottom: 15px;
+    }
+  
+  .btn-bottom-middle { 
+        position: fixed;
+        z-index: 1088;
+        left: 50%;
+        right: 50%;
+        bottom: 15px;
+  }
+
+  .card-rounded {
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+  }
+  
+  .border-top-rounded{
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+  }
+  
+  .border-bottom-rounded{
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+  }
+
+  .bg-amarillo {
+    background-color: beige;
+    font-weight: bold;
+  }
+  
+  /* EVITA QUE UNA MODAL INFERIOR A OTRA PIERDA EL SCROLL */
+  .modal-with-scroll{
+    overflow-y: scroll; 
+  }
+
+  .foot {
+    bottom: 0;
+    position: sticky;
+}
+
+
+
 /* BOTON FLOTANTE ESQUINA DERECHA */
 #fixed-btn2 { 
 position: fixed;

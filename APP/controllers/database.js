@@ -3,7 +3,7 @@ window.onload = function () {
     initiateDb();
 };
 //nombre de la base de datos
-const DbName = "express";
+const DbName = "express2";
 
 function initiateDb() {
     
@@ -93,12 +93,14 @@ function getTbl() {
             { Name: "anio" },
             { Name: "mes" },
             { Name: "dia" },
+            { Name: "fecha", DataType: "string" },
             { Name: "codcliente", NotNull: true },
             { Name: "nomcliente", DataType: "string" },
             { Name: "totalventa", NotNull: true },
             { Name: "totalcosto", NotNull: true },
             { Name: "obs", DataType: "string" },
-            { Name: "st"}
+            { Name: "st"},
+            { Name: "jsondocproductos", DataType: "string" }
         ]
     }
         //TABLA CENSO
@@ -380,8 +382,7 @@ function dbSelectTempVentas(contenedor) {
         var HtmlString = "";
         productos.forEach(function (prod) {
             HtmlString += "<tr Id=" + prod.Id + ">" + 
-            "<td class='col-4'>" + prod.desprod + "</td>" + 
-            "<td class='col-2'>" + prod.codmedida + "</td>" + 
+            "<td class='col-6'>" + prod.desprod + "<br><small>" + prod.codmedida + "</small></td>" + 
             "<td class='col-1'>" + prod.cantidad + "</td>" + 
             "<td class='col-2'>" + funciones.setMoneda(prod.subtotal,'Q') + "</td>" +
             "<td class='col-1'>" + 
@@ -549,79 +550,78 @@ function dbDeleteTempProductoAll(confirm) {
 };
 
 // inserta un PEDIDO EN LA TABLA DOCUMENTOS
-function dbInsertDocumentos(coddoc,correlativo,codcliente,nomcliente,totalventa,empnit,totalcosto,obs,st) {
-    var data = {
-        empnit:empnit,
-        coddoc:coddoc,
-        correlativo:correlativo,
-        codcliente:codcliente,
-        nomcliente:nomcliente,
-        totalventa:totalventa,
-        totalcosto:totalcosto,
-        obs:obs,
-        st: Number(st)
-    }
+function dbInsertDocumentos(coddoc,correlativo,codcliente,nomcliente,totalventa,empnit,totalcosto,obs,st,fecha) {
+    
+    let jsondocproductos = [];
 
-    DbConnection.insert({
-        Into: "documentos",
-        Values: [data]
-    }, function (rowsAdded) {
-       //funciones.showNotification('bottom','right','Venta Registrada exitosamente!!',)
-       funciones.Aviso('Venta Registrada exitosamente!!');
-    }, function (err) {
-        console.log(err);
-        //alert('Error Occured while adding data')
+    dbInsertDocproductos()
+    .then((data)=>{
+        jsondocproductos = JSON.stringify(data);  
+        
+        var data = {
+            empnit:empnit,
+            coddoc:coddoc,
+            fecha:fecha,
+            correlativo:correlativo,
+            codcliente:codcliente,
+            nomcliente:nomcliente,
+            totalventa:totalventa,
+            totalcosto:totalcosto,
+            obs:obs,
+            st: Number(st),
+            jsondocproductos: jsondocproductos
+        }
+        
+        console.log(jsondocproductos);
+    
+        DbConnection.insert({
+            Into: "documentos",
+            Values: [data]
+        }, function (rowsAdded) {
+           //funciones.showNotification('bottom','right','Venta Registrada exitosamente!!',)
+           funciones.Aviso('Venta Registrada exitosamente!!');
+        }, function (err) {
+            console.log(err);
+            //alert('Error Occured while adding data')
+        })
+
     })
+    .catch(()=>{
+        funciones.AvisoError('No se pudo leer el detalle del pedido');
+        return;
+    })
+
+
+
 };
 
 // inserta un PEDIDO EN LA TABLA DOCPRODUCTOS
-function dbInsertDocproductos(coddoc,correlativo,empnit) {
-    //declaro las variables a usar
-    let strData = '';
+function dbInsertDocproductos() {
 
-    DbConnection.select({
-        From: "tempVentas"
-    }, function (productos) {
-
-        productos.forEach(function (prod) {
-            let data ={
-                empnit:empnit,
-                coddoc:coddoc,
-                correlativo:correlativo,
-                codprod:prod.codprod,
-                desprod:prod.desprod,
-                codmedida:prod.codmedida,
-                cantidad:prod.cantidad,
-                precio:prod.precio,
-                subtotal:prod.subtotal,
-                equivale:prod.equivale,
-                costo:prod.costo,
-                totalcosto:prod.totalcosto
-            };
-              // inserta los datos en la tabla docproductos
-            DbConnection.insert({
-                Into: "docproductos",
-                Values: [data]
-            }, function (rowsAdded) {
-                //funciones.Aviso('Venta Registrada exitosamente!!');
-                console.log('Row agregada a docproductos')
-            }, function (err) {
-                console.log('Error Docproductos: ' + String(err));
-            })
-
-        }, function (error) {
-            console.log(error);
+    return new Promise((resolve, reject) => {
+        DbConnection.select({
+            From: "tempVentas"
+        }, function (data) {
+                resolve(data);               
+            }, function (error) {
+                reject(error);
         })
-        console.log('DATOS AGREGADOS A DOCPRODUCTOS');
-  
-    });
+    })
+
 };
+
 
 //Selecciona todos los Documentos guardados 
 function dbSelectDocumentos(contenedor,st) {
     let titulo =document.getElementById('lbTituloVentas');
-    if (st==Number(1)){titulo.innerText='Pedidos Pendientes'}else{titulo.innerText='Pedidos Enviados'};
-  
+    if (st==Number(1)){
+        titulo.innerText='Pedidos Pendientes';
+        document.getElementById('containerTipoPedidos').style = "background-color: #888 !important; color: white;";
+    }else{
+        titulo.innerText='Pedidos Enviados';
+        document.getElementById('containerTipoPedidos').style = "background-color: #86327a !important; color: white;";
+    };
+    
    
     DbConnection.select({
         From: "documentos"
@@ -719,7 +719,7 @@ function dbEliminarPedidosTodos() {
 
 // ENVIAR UN PEDIDO SEGUN SU ID
 function dbSendPedido(Id) {
-      
+        
     DbConnection.select({
         From: "documentos",
         Where: {
@@ -728,16 +728,17 @@ function dbSendPedido(Id) {
     }, function (documento) {
                         
         documento.forEach(function (doc) {
-           var correlativo = doc.correlativo;
-           var codcliente = doc.codcliente;
-           var totalventa = doc.totalventa;
-           var totalcosto = doc.totalcosto;
-           var obs = doc.obs;
-           var st = doc.st;
-            
-           //SyncDocumentos('iEx',GlobalCoddoc,correlativo,2018,12,2,codcliente,GlobalCodven,totalventa)
-           SyncDocumentos(GlobalToken,GlobalCoddoc,correlativo,2019,1,6,codcliente,GlobalCodven,totalventa,totalcosto,obs,st);
-            //.then(funciones.Aviso('Datos enviados...'))
+            var fecha = doc.fecha;
+            var correlativo = doc.correlativo;
+            var codcliente = doc.codcliente;
+            var totalventa = doc.totalventa;
+            var totalcosto = doc.totalcosto;
+            var obs = doc.obs;
+            var st = doc.st;
+            var jsonp = doc.jsondocproductos;
+           
+           SyncDocumentos(GlobalToken,GlobalCoddoc,correlativo,fecha,2019,1,6,codcliente,GlobalCodven,totalventa,totalcosto,obs,st,jsonp);
+          
 
         }, function (error) {
             console.log(error);
@@ -745,32 +746,6 @@ function dbSendPedido(Id) {
        
     });
 
-    DbConnection.select({
-        From: "docproductos",
-        Where: {
-                correlativo: Number(Id)
-            }
-    }, function (documento) {
-                        
-        documento.forEach(function (doc) {
-           var correlativo = doc.correlativo;
-           var codprod = doc.codprod;
-           var desprod = doc.desprod;
-           var cantidad = doc.cantidad;
-           var codmedida = doc.codmedida;
-           var precio = doc.precio;
-           var totalprecio = doc.subtotal;
-           var equivale = doc.equivale;
-           var costo = doc.costo;
-           var totalcosto = doc.totalcosto;1
-
-           //console.log(doc.desprod);                      
-           SyncDocumentosDet(GlobalToken,GlobalEmpnit,GlobalCoddoc,correlativo,2019,1,6,codprod,desprod,codmedida,equivale,cantidad,costo,totalcosto,precio,totalprecio);
   
-        }, function (error) {
-            console.log(error);
-        })
-
-     
-    });
 };
+

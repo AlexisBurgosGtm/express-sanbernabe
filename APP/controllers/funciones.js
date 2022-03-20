@@ -344,17 +344,70 @@ funciones = {
             }
         }
   },
-
-
    scrollUp: function(duration, easing) {
       window.scroll(0, 0);
   },
+  getFecha(){
+    let fecha
+    let f = new Date(); 
+    let d = f.getDate(); 
+    let m = f.getUTCMonth()+1; 
 
+    switch (d.toString()) {
+      case '30':
+        m = f.getMonth()+1; 
+        break;
+      case '31':
+        m = f.getMonth()+1; 
+          break;
+    
+      default:
 
-  ApiUpdate: async function(empnit){
-   //let apiAll = await fetch('/api/update/all')
-     // .then(console.log('Actualización terminada...'))
+        break;
     }
 
+    
+    let y = f.getFullYear();
+   
+    di = d;
+    var D = '0' + di;
+    let DDI 
+    if(D.length==3){DDI=di}else{DDI=D}
+    
+    ma = m;
+    var MA = '0' + ma;
+    let DDM 
+    if(MA.length==3){DDM=ma}else{DDM=MA}
 
+
+    fecha = y + '-' + DDM + '-' + DDI;
+    return fecha;
+  },
+  limpiarTexto: (texto) =>{
+    var ignorarMayMin = true;
+    var reemplazarCon = " pulg";
+    var reemplazarQue = '"';
+    reemplazarQue = reemplazarQue.replace(/[\\^$.|?*+()[{]/g, "\\$&"),
+    reemplazarCon = reemplazarCon.replace(/\$(?=[$&`"'\d])/g, "$$$$"),
+    modif = "g" + (ignorarMayMin ? "i" : ""),
+    regex = new RegExp(reemplazarQue, modif);
+    return texto.replace(regex,reemplazarCon);
+  },
+  devuelveFecha: (idInputFecha)=>{
+    let fe = new Date(document.getElementById(idInputFecha).value);
+    let ae = fe.getFullYear();
+    let me = fe.getUTCMonth()+1;
+    let de = fe.getUTCDate() 
+    let fret = ae + '-' + me + '-' + de;
+    return fret;
+  }, 
+  getHora:()=>{
+    let hoy = new Date();
+    let hora = hoy.getHours();
+    let minuto = hoy.getMinutes();
+    return `${hora.toString()}:${minuto.toString()}`;
+  },
+  gotoGoogleMaps:(lat,long)=>{
+    window.open(`https://www.google.com/maps?q=${lat},${long}`);
+  }
 };

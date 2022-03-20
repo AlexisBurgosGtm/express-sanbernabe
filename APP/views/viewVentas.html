@@ -1,12 +1,12 @@
-<div class="card">
-    <div class="card-header">
+<div class="card card-rounded shadow">
+    <div class="card-header" id="containerTipoPedidos">
         <h5 id="lbTituloVentas">Pedidos sin Enviar</h5>
-        <button class="btn btn-info btn-icon btn-round btn-sm" data-dismiss="modal" id="btnPedidosPendientes" onclick="dbSelectDocumentos(document.getElementById('tblDocumentos'),1);">
-            <i class="now-ui-icons design_bullet-list-67"></i>
-        </button>Pendientes
-        <button class="btn btn-danger btn-icon btn-round btn-sm" data-dismiss="modal" id="btnPedidosEnviados" onclick="dbSelectDocumentos(document.getElementById('tblDocumentos'),0);">
-            <i class="now-ui-icons ui-1_check"></i>
-        </button>Enviados
+        <button class="btn btn-secondary btn-md border-white" id="btnPedidosPendientes" onclick="dbSelectDocumentos(document.getElementById('tblDocumentos'),1);">
+            <i class="now-ui-icons design_bullet-list-67"></i>Pendientes
+        </button>
+        <button class="btn btn-primary btn-md border-white" id="btnPedidosEnviados" onclick="dbSelectDocumentos(document.getElementById('tblDocumentos'),0);">
+            <i class="now-ui-icons ui-1_check"></i>Enviados
+        </button>
     </div>
     <div class="card-body">
    
@@ -14,9 +14,9 @@
     
 </div>
 
-<div class="card table-responsive" id="tblVentas">
+<div class="card table-responsive card-rounded shadow" id="tblVentas">
     <table class="table table-bordered">
-        <thead>
+        <thead class="bg-secondary text-white">
             <tr>
                 <td class="col-1-sm col-1-md">No.</td>
                 <td class="col-6-sm col-6-md">Cliente</td>
@@ -36,59 +36,67 @@
 
 <!-- Modal Opciones Pedido -->
 <div class="modal fade" id="ModalOpcionesPedido" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-              <span class="text-right"><label class="text-primary" id="txtIdPedido">pedido1</label> </span>
-            <div class="modal-header">
-              <label class="modal-title" id="txtNomClientePedido">Consumidor Final</label>
-    
-            </div>
-            <div class="modal-body">
-              <div class="col-8">
-                <div class="row">
-                    <label>Total Venta:</label>
-                    <b>
-                      <h3 class="text-right"  id="txtTotalPedido">Q 5000.00</h3>
-                    </b>
-                </div>
-    
-              </div>
+    <div class="modal-dialog" role="document">
+                <div class="modal-content">
 
-            </div>
-            <div class="">
-                <div class="card">
-                    <button type="button" class="btn btn-secondary btn-icon btn-round btn-lg" data-dismiss="modal" id="btnVentasCancelar">
-                        <i class="now-ui-icons ui-1_simple-remove"></i>
-                    </button>
-                    Cancelar
+                    <span class="text-right"><label class="text-primary" id="txtIdPedido">pedido1</label> </span>
+                    <div class="modal-header">
+                        <label class="modal-title" id="txtNomClientePedido">Consumidor Final</label>
+                    </div>
+
+                    <div class="modal-body">
+                            <div class="col-8">
+                                <div class="row">
+                                    <label>Total Venta:</label>
+                                    <b>
+                                    <h3 class="text-right"  id="txtTotalPedido">Q 5000.00</h3>
+                                    </b>
+                                </div>
+                    
+                            </div>
+
+                            <div class="row">
+                                
+                                    <div class="card card-rounded shadow col-6" data-dismiss="modal" id="btnVentasCancelar">
+                                        <button type="button" class="btn btn-secondary btn-icon btn-round btn-lg">
+                                            <i class="now-ui-icons ui-1_simple-remove"></i>
+                                        </button>
+                                        Cancelar
+                                    </div>
+
+                                    <div class="card card-rounded shadow col-6" id="btnVentasEditar">
+                                        <button class="btn btn-info btn-icon btn-round btn-lg">
+                                            <i class="now-ui-icons ui-1_lock-circle-open"></i>
+                                        </button>
+                                        Editar
+                                    </div>
+                                        
+                            </div>
+
+                            <div class="row">
+                                    <div class="card card-rounded shadow col-6" id="btnVentasEliminar">
+                                        <button type="button" class="btn btn-danger btn-icon btn-round btn-lg">
+                                            <i class="now-ui-icons media-1_button-power"></i> 
+                                        </button>
+                                    Borrar Pedido
+                                    </div>
+                                    <div class="card card-rounded shadow col-6" id="btnVentasEnviar">
+                                        <button type="button" class="btn btn-primary btn-icon btn-round btn-lg" >
+                                            <i class="now-ui-icons ui-1_send"></i> 
+                                        </button>
+                                    Enviar
+                                    </div>
+                            </div>
+
+                    </div>
+                
                 </div>
-                <div class="card">
-                    <button class="btn btn-info btn-icon btn-round btn-lg" id="btnVentasEditar">
-                        <i class="now-ui-icons ui-1_lock-circle-open"></i>
-                    </button>
-                    Editar
-                </div>
-                <div class="card">
-                    <button type="button" class="btn btn-danger btn-icon btn-round btn-lg" id="btnVentasEliminar">
-                        <i class="now-ui-icons media-1_button-power"></i> 
-                    </button>
-                  Borrar Pedido
-                </div>
-                <div class="card">
-                    <button type="button" class="btn btn-primary btn-icon btn-round btn-lg" id="btnVentasEnviar">
-                        <i class="now-ui-icons ui-1_send"></i> 
-                    </button>
-                  Enviar
-                </div>
-         
-            </div>
-          </div>
-        </div>
+    </div>
 </div>
 
 <!-- botón nuevo -->
 <div id="fixed-btn2">
-    <button class="btn btn-success btn-circle btn-xl" id="btnNuevoPedido" onclick="CrearNuevoPedido();">+</button>
+    <button class="btn btn-success btn-circle btn-xl shadow hand" id="btnNuevoPedido" onclick="CrearNuevoPedido();">+</button>
 </div>
 
 <style>

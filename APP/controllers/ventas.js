@@ -214,9 +214,9 @@ async function dbGuardarVenta(codcliente,nomcliente){
 };
 
 async function dbFinalizarPedido(){
-  let obs = document.getElementById('txtPedidoObs').value;
+  let obs = document.getElementById('txtPedidoObs').value || 'SN';
   let stReparto = document.getElementById('cmbPedidoTipoEntrega').value;
-
+  obs = funciones.limpiarTexto(obs);
 
   dbGetValCorrelativo(1); //carga el correlativo de documentos en la global
 
@@ -224,8 +224,8 @@ async function dbFinalizarPedido(){
   .then((value) => {
        
     if (value==true){
-      dbInsertDocumentos(GlobalCoddoc,GlobalCorrelativo,GlobalCodCliente,GlobalNomCliente,GlobalTotalVenta,GlobalEmpnit,GlobalTotalCosto,obs,stReparto);
-      dbInsertDocproductos(GlobalCoddoc,GlobalCorrelativo,GlobalEmpnit);
+      dbInsertDocumentos(GlobalCoddoc,GlobalCorrelativo,GlobalCodCliente,GlobalNomCliente,GlobalTotalVenta,GlobalEmpnit,GlobalTotalCosto,obs,stReparto,funciones.getFecha());
+      //dbInsertDocproductos(GlobalCoddoc,GlobalCorrelativo,GlobalEmpnit);
       funciones.loadView('./views/viewVentas.html')
           .then(()=>{
             dbSelectDocumentos(document.getElementById('tblDocumentos'),1);
