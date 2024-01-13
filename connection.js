@@ -1,8 +1,16 @@
-const config = {
+const configOLD = {
     user: 'DB_A54053_Respaldobd_admin',
     password: 'Alexis2020',
     server: 'SQL5049.site4now.net',
     database: 'DB_A54053_Respaldobd',
+    pool: {	max: 100,	min: 0,	idleTimeoutMillis: 30000}
+};
+
+const config = {
+    user: 'db_a6478c_onnebsync_admin',
+    password: 'razors1805',
+    server: 'sql5052.site4now.net',
+    database: 'db_a6478c_onnebsync',
     pool: {	max: 100,	min: 0,	idleTimeoutMillis: 30000}
 };
 
